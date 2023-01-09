@@ -1,7 +1,10 @@
 'use strict';
 
+// @ts-ignore
 var makeOrdinal = require('./makeOrdinal');
+// @ts-ignore
 var isFinite = require('./isFinite');
+// @ts-ignore
 var isSafeNumber = require('./isSafeNumber');
 
 const TEN = 10;
@@ -48,7 +51,7 @@ function toWords(number: string, asOrdinal: boolean) {
     return asOrdinal ? makeOrdinal(words) : words;
 }
 
-function generateWords(number: number):string {
+function generateWords(number: number, arr?: string[]):string {
     let remainder, word,
         words =
             arguments[1];
@@ -107,9 +110,7 @@ function generateWords(number: number):string {
     }
 
     words.push(word);
-    return generateWords(remainder, /*words*/);
-//    не понимаю откуда тут появляется второй аргумент
-
+    return generateWords(remainder, words);
 }
 
 export default toWords;
