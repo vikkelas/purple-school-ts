@@ -1,5 +1,4 @@
 'use strict';
-
 // @ts-ignore
 var makeOrdinal = require('./makeOrdinal');
 // @ts-ignore
@@ -7,14 +6,25 @@ var isFinite = require('./isFinite');
 // @ts-ignore
 var isSafeNumber = require('./isSafeNumber');
 
-const TEN = 10;
-const ONE_HUNDRED = 100;
-const ONE_THOUSAND = 1000;
-const ONE_MILLION = 1000000;
-const ONE_BILLION = 1000000000;           //         1.000.000.000 (9)
-const ONE_TRILLION = 1000000000000;       //     1.000.000.000.000 (12)
-const ONE_QUADRILLION = 1000000000000000; // 1.000.000.000.000.000 (15)
-const MAX = 9007199254740992;             // 9.007.199.254.740.992 (15)
+enum STRING_NUMBER {
+    TEN = 10,
+    ONE_HUNDRED = 100,
+    ONE_THOUSAND = 1000,
+    ONE_MILLION = 1000000,
+    ONE_BILLION = 1000000000,          //         1.000.000.000 (9)
+    ONE_TRILLION = 1000000000000,       //     1.000.000.000.000 (12)
+    ONE_QUADRILLION = 1000000000000000, // 1.000.000.000.000.000 (15)
+    MAX = 9007199254740992
+}
+
+// const TEN = 10;
+// const ONE_HUNDRED = 100;
+// const ONE_THOUSAND = 1000;
+// const ONE_MILLION = 1000000;
+// const ONE_BILLION = 1000000000;           //         1.000.000.000 (9)
+// const ONE_TRILLION = 1000000000000;       //     1.000.000.000.000 (12)
+// const ONE_QUADRILLION = 1000000000000000; // 1.000.000.000.000.000 (15)
+// const MAX = 9007199254740992;             // 9.007.199.254.740.992 (15)
 
 const LESS_THAN_TWENTY = [
     'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
@@ -33,10 +43,15 @@ const TENTHS_LESS_THAN_HUNDRED = [
  * @param {boolean} [asOrdinal] - Deprecated, use toWordsOrdinal() instead!
  * @returns {string}
  */
-function toWords(number: string, asOrdinal: boolean) {
+function toWords(number: string | number, asOrdinal: boolean) {
     let words;
-    let num: number = parseInt(number, 10);
-
+    let num: number
+    if (typeof (number) === 'number') {
+        num = number;
+    }
+    if (typeof (number) === 'string') {
+        num = parseInt(number, 10);
+    }
     if (!isFinite(num)) {
         throw new TypeError(
             'Not a finite number: ' + number + ' (' + typeof number + ')'
@@ -51,7 +66,7 @@ function toWords(number: string, asOrdinal: boolean) {
     return asOrdinal ? makeOrdinal(words) : words;
 }
 
-function generateWords(number: number, arr?: string[]):string {
+function generateWords(number: number, arr?: string[]): string {
     let remainder, word,
         words =
             arguments[1];
@@ -74,38 +89,38 @@ function generateWords(number: number, arr?: string[]):string {
         remainder = 0;
         word = LESS_THAN_TWENTY[number];
 
-    } else if (number < ONE_HUNDRED) {
-        remainder = number % TEN;
-        word = TENTHS_LESS_THAN_HUNDRED[Math.floor(number / TEN)];
+    } else if (number < STRING_NUMBER.ONE_HUNDRED) {
+        remainder = number % STRING_NUMBER.TEN;
+        word = TENTHS_LESS_THAN_HUNDRED[Math.floor(number / STRING_NUMBER.TEN)];
         // In case of remainder, we need to handle it here to be able to add the “-”
         if (remainder) {
             word += '-' + LESS_THAN_TWENTY[remainder];
             remainder = 0;
         }
 
-    } else if (number < ONE_THOUSAND) {
-        remainder = number % ONE_HUNDRED;
-        word = generateWords(Math.floor(number / ONE_HUNDRED)) + ' hundred';
+    } else if (number < STRING_NUMBER.ONE_THOUSAND) {
+        remainder = number % STRING_NUMBER.ONE_HUNDRED;
+        word = generateWords(Math.floor(number / STRING_NUMBER.ONE_HUNDRED)) + ' hundred';
 
-    } else if (number < ONE_MILLION) {
-        remainder = number % ONE_THOUSAND;
-        word = generateWords(Math.floor(number / ONE_THOUSAND)) + ' thousand,';
+    } else if (number < STRING_NUMBER.ONE_MILLION) {
+        remainder = number % STRING_NUMBER.ONE_THOUSAND;
+        word = generateWords(Math.floor(number / STRING_NUMBER.ONE_THOUSAND)) + ' thousand,';
 
-    } else if (number < ONE_BILLION) {
-        remainder = number % ONE_MILLION;
-        word = generateWords(Math.floor(number / ONE_MILLION)) + ' million,';
+    } else if (number < STRING_NUMBER.ONE_BILLION) {
+        remainder = number % STRING_NUMBER.ONE_MILLION;
+        word = generateWords(Math.floor(number / STRING_NUMBER.ONE_MILLION)) + ' million,';
 
-    } else if (number < ONE_TRILLION) {
-        remainder = number % ONE_BILLION;
-        word = generateWords(Math.floor(number / ONE_BILLION)) + ' billion,';
+    } else if (number < STRING_NUMBER.ONE_TRILLION) {
+        remainder = number % STRING_NUMBER.ONE_BILLION;
+        word = generateWords(Math.floor(number / STRING_NUMBER.ONE_BILLION)) + ' billion,';
 
-    } else if (number < ONE_QUADRILLION) {
-        remainder = number % ONE_TRILLION;
-        word = generateWords(Math.floor(number / ONE_TRILLION)) + ' trillion,';
+    } else if (number < STRING_NUMBER.ONE_QUADRILLION) {
+        remainder = number % STRING_NUMBER.ONE_TRILLION;
+        word = generateWords(Math.floor(number / STRING_NUMBER.ONE_TRILLION)) + ' trillion,';
 
-    } else if (number <= MAX) {
-        remainder = number % ONE_QUADRILLION;
-        word = generateWords(Math.floor(number / ONE_QUADRILLION)) +
+    } else if (number <= STRING_NUMBER.MAX) {
+        remainder = number % STRING_NUMBER.ONE_QUADRILLION;
+        word = generateWords(Math.floor(number / STRING_NUMBER.ONE_QUADRILLION)) +
             ' quadrillion,';
     }
 
